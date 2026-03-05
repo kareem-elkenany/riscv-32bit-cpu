@@ -1,276 +1,176 @@
-\# RV32I 32-Bit RISC-V CPU – Single-Cycle (Logisim 2.7.1)
+# RV32I 32-Bit RISC-V CPU (Logisim)
 
+A modular **32-bit RISC-V processor built in Logisim**, progressing from a **single-cycle architecture** to a **5-stage pipelined CPU**.
 
-
-A 32-bit single-cycle RISC-V (RV32I subset) processor implemented structurally in Logisim.
-
-
-
-This project was developed as part of a computer architecture course and implements a complete single-cycle core with verified control flow, memory operations, branching, and jump/return behavior (JAL/JALR).
-
-
+This project demonstrates the evolution of processor architecture, including reusable datapath components, control logic, and instruction verification tests.
 
 ---
 
+## Project Overview
 
+This repository implements a subset of the **RV32I instruction set architecture** and explores how processor design evolves from simple to more advanced implementations.
 
-\## Overview
+Two processor architectures are included:
 
-
-
-The processor executes one instruction per clock cycle using a fully structural datapath design. All major components (ALU, Control Unit, Register File, Immediate Generator, Data Memory) are modularized and implemented as separate subcircuits.
-
-
-
-The implementation follows the RV32I base integer instruction format and supports arithmetic, logical, control-flow, and memory instructions.
-
-
+| Architecture | Status |
+|--------------|--------|
+| Single-Cycle CPU | Fully working |
+| 5-Stage Pipelined CPU | Working datapath (hazard detection and cache pending) |
 
 ---
 
+## Repository Structure
 
-
-\## Supported Instruction Subset
-
-
-
-\### Arithmetic \& Logical
-
-\- ADD
-
-\- SUB
-
-\- ADDI
-
-\- AND
-
-\- OR
-
-\- XOR
-
-\- SLT
-
-
-
-\### Memory
-
-\- LW
-
-\- SW
-
-
-
-\### Control Flow
-
-\- BEQ
-
-\- JAL
-
-\- JALR
-
-
+```
+riscv-32bit-cpu
+│
+├── single-cycle
+│   ├── cpu_single_cycle.circ
+│   ├── components
+│   ├── tests
+│   └── screenshots
+│
+├── pipelined
+│   ├── cpu_pipelined.circ
+│   ├── components
+│   ├── tests
+│   └── screenshots
+│
+└── README.md
+```
 
 ---
 
+## Implemented Architectures
 
+### Single-Cycle CPU
 
-\## Architectural Features
+The single-cycle processor executes **one instruction per clock cycle**.
 
+This architecture serves as the baseline implementation before introducing pipelining.
 
+#### Features
 
-\### Single-Cycle Datapath
+- RV32I instruction subset
+- Modular datapath
+- Immediate Generator
+- Branch Unit
+- Register File
+- ALU and ALU Control
+- Instruction Memory
+- Data Memory
+- Verified instruction test programs
 
-\- One instruction completed per clock cycle
+Directory:
 
-\- Dedicated adders for:
-
-&nbsp; - PC + 4
-
-&nbsp; - PC + immediate (branch / JAL)
-
-&nbsp; - rs1 + immediate (JALR)
-
-\- Priority-based PC selection logic
-
-
-
-\### ALU
-
-\- Supports arithmetic, logical, and comparison operations
-
-\- Controlled via ALUOp and funct3/funct7 decoding
-
-
-
-\### Immediate Generator
-
-Supports proper reconstruction and sign-extension for:
-
-\- I-Type
-
-\- S-Type
-
-\- B-Type
-
-\- U-Type
-
-\- J-Type
-
-
-
-\### Register File
-
-\- 32 general-purpose registers
-
-\- Dual read ports
-
-\- Single write port
-
-\- x0 permanently hardwired to zero
-
-
-
-\### Data Memory
-
-\- Byte-addressable memory
-
-\- Word-aligned load/store operations
-
-
-
-\### Jump Handling
-
-\- JAL: PC = PC + immediate
-
-\- JALR: PC = (rs1 + immediate) \& ~1
-
-\- Correct return address storage (rd = PC + 4)
-
-
-
----
-
-
-
-\## Project Structure
-
-
-
+```
 single-cycle/
-
-│
-
-├── cpu\_single\_cycle.circ # Top-level processor entry file
-
-├── components/
-
-│ ├── alu.circ
-
-│ ├── alu\_control.circ
-
-│ ├── main\_control.circ
-
-│ ├── register\_file.circ
-
-│ ├── immediate\_generator.circ
-
-│ ├── branch\_unit.circ
-
-│ └── data\_memory.circ
-
-│
-
-├── screenshots/
-
-└── tests/
-
-
+```
 
 ---
 
+### 5-Stage Pipelined CPU
 
+The pipelined CPU improves performance by allowing multiple instructions to be processed simultaneously.
 
-\## Verification
+#### Pipeline Stages
 
+1. **IF** — Instruction Fetch  
+2. **ID** — Instruction Decode  
+3. **EX** — Execute  
+4. **MEM** — Memory Access  
+5. **WB** — Write Back  
 
+Pipeline registers propagate control signals and data between stages.
 
-The single-cycle core was tested using a comprehensive instruction sequence that validates:
+#### Features
 
+- Pipeline registers between stages
+- Modular datapath design
+- Correct sequential instruction execution
+- Clean separation of control and datapath
 
+#### Current Limitations
 
-\- Arithmetic correctness
+- Hazard detection not implemented yet
+- Data forwarding not implemented yet
+- Cache system not implemented yet
 
-\- Logical operations
+Directory:
 
-\- Load/store behavior
-
-\- Branch taken path
-
-\- JAL and JALR return behavior
-
-
-
-Key observed results:
-
-
-
-\- Correct arithmetic outputs
-
-\- Branch correctly skips instructions when taken
-
-\- JAL stores PC+4 into rd
-
-\- JALR returns to the correct instruction address
-
-\- Register x13 correctly updated after return
-
-
-
-Full expected register and memory state is available in: single-cycle/tests/expected\_results.txt
-
-
-
-
+```
+pipelined/
+```
 
 ---
 
+## Components
 
+Reusable processor modules are located in each architecture’s `components` directory.
 
-\## How to Run
+Examples include:
 
+- ALU
+- ALU Control
+- Branch Unit
+- Immediate Generator
+- Main Control
+- Register File
 
-
-1\. Open Logisim 2.7.1
-
-2\. Open:
-
-
-
-&nbsp;  single-cycle/cpu\_single\_cycle.circ
-
-
-
-3\. Load the provided memory image from the `tests` folder into instruction memory
-
-4\. Run the clock
-
-
-
-Ensure the folder structure is preserved so that all subcircuits load correctly.
-
-
+These modules are designed to be reusable between architectures.
 
 ---
 
+## Testing
 
+Instruction test programs are provided to verify processor correctness.
 
-\## Author
+Tests validate:
 
+- Register writes
+- Arithmetic instructions
+- Memory operations
+- Branch behavior
 
+Test programs are located inside:
 
-Kareem Elkenany  
+```
+tests/
+```
 
+Each test includes documentation explaining how to run it and what results to expect.
+
+---
+
+## Tools Used
+
+- **Logisim Evolution**
+- **RISC-V ISA Specification**
+- Custom instruction test programs
+
+---
+
+## Future Improvements
+
+Planned architectural improvements include:
+
+- Hazard detection unit
+- Data forwarding
+- Pipeline stall logic
+- Branch flushing
+- Instruction cache
+- Data cache
+
+---
+
+## Author
+
+**Kareem Elkenany**  
 Computer Engineering Student  
-
 Egypt University of Informatics
 
+---
+
+## License
+
+MIT License
