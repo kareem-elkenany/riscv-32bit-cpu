@@ -1,0 +1,47 @@
+==================================================
+PIPELINED CPU TEST — EXPECTED RESULTS
+==================================================
+
+If the pipelined CPU is functioning correctly (without hazards),
+the following register and memory values should appear after the
+test program finishes executing.
+
+--------------------------------------------------
+REGISTER FILE
+--------------------------------------------------
+
+x0 = 0
+x1 = 5
+x2 = 10
+x3 = 15
+x4 = 0
+
+--------------------------------------------------
+DATA MEMORY
+--------------------------------------------------
+
+mem[0] = 15
+mem[4] = 15
+
+--------------------------------------------------
+QUICK CHECK
+--------------------------------------------------
+
+Registers:
+x1 = 5
+x2 = 10
+x3 = 15
+x4 = 0
+
+Memory:
+mem[0] = 15
+mem[4] = 15
+
+If these values match, the pipeline datapath is
+working correctly.
+
+Note:
+This test assumes no hazards are present in the
+instruction sequence. Since hazard detection and
+forwarding are not implemented yet, certain
+instruction patterns may produce incorrect results.
